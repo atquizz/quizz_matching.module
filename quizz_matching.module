@@ -1,0 +1,92 @@
+<?php
+
+use Drupal\quizz_question\Entity\QuestionType;
+
+/**
+ * @file
+ * Matching question type for quiz module
+ *
+ * Allows the creation of matching questions, which associate one term with another.
+ */
+
+/**
+ * Implements hook_quiz_question_info().
+ */
+function quizz_matching_quiz_question_info() {
+  return array(
+      'matching' => array(
+          'name'              => t('Matching'),
+          'description'       => t('Matching question type for quiz module. A question type for the quiz module: allows you to create matching type questions, which connect terms with one another.'),
+          'question provider' => 'Drupal\quizz_matching\MatchingQuestion',
+          'response provider' => 'Drupal\quizz_matching\MatchingResponse',
+          'module'            => 'quizz_question', // All wrapper functions are in that module.
+      ),
+  );
+}
+
+/**
+ * Implements hook_quiz_question_config().
+ *
+ * @return FAPI array
+ */
+function quizz_matching_quiz_question_config(QuestionType $question_type) {
+  $form = array('#validate' => array('quizz_matching_config_validate'));
+
+  $form['quiz_matching_form_size'] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Match Question Size'),
+      '#description'   => t('Number of questions allowed to wrap under a matching type question.'),
+      '#default_value' => $question_type->getConfig('quiz_matching_form_size', 5),
+  );
+
+  $form['quiz_matching_shuffle_options'] = array(
+      '#type'          => 'checkbox',
+      '#title'         => t('Shuffle Matching Questions'),
+      '#default_value' => $question_type->getConfig('quiz_matching_shuffle_options', TRUE),
+      '#description'   => t('If checked matching questions will be shuffled'),
+  );
+
+  return $form;
+}
+
+/**
+ * Validate the matching config form values
+ */
+function quizz_matching_config_validate($form, $form_state) {
+  if (!quizz_valid_integer($form_state['values']['quiz_matching_form_size'], 2, 50)) {
+    form_set_error('quiz_matching_form_size', t('The number of questions must be between 2 and 50'));
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function quizz_matching_theme() {
+  return array(
+      'matching_question_form'    => array(
+          'render element' => 'form',
+          'path'           => drupal_get_path('module', 'quizz_matching') . '/theme',
+          'file'           => 'quizz_matching.theme.inc',
+      ),
+      'matching_response'         => array(
+          'variables' => array('metadata' => NULL, 'data' => NULL),
+          'path'      => drupal_get_path('module', 'quizz_matching') . '/theme',
+          'file'      => 'quizz_matching.theme.inc',
+      ),
+      'matching_subquestion_form' => array(
+          'render element' => 'form',
+          'path'           => drupal_get_path('module', 'quizz_matching') . '/theme',
+          'file'           => 'quizz_matching.theme.inc',
+      ),
+      'matching_match_node_view'  => array(
+          'variables' => array('subquestions' => NULL),
+          'path'      => drupal_get_path('module', 'quizz_matching') . '/theme',
+          'file'      => 'quizz_matching.theme.inc',
+      ),
+      'matching_answering_form'   => array(
+          'render element' => 'form',
+          'path'           => drupal_get_path('module', 'quizz_matching') . '/theme',
+          'template'       => 'matching-answering-form',
+      ),
+  );
+}
