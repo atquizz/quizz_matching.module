@@ -124,7 +124,7 @@ class MatchingResponse extends ResponseHandler {
       $data[] = array(
           'choice'            => $match['question'],
           'attempt'           => !empty($answers[$match['match_id']]) ? $solution[1][$answers[$match['match_id']]] : '',
-          'correct'           => $answers[$match['match_id']] == $match['match_id'] ? theme('quiz_answer_result', array('type' => 'correct')) : theme('quiz_answer_result', array('type' => 'incorrect')),
+          'correct'           => $answers[$match['match_id']] == $match['match_id'] ? theme('quizz_answer_result', array('type' => 'correct')) : theme('quizz_answer_result', array('type' => 'incorrect')),
           'score'             => $answers[$match['match_id']] == $match['match_id'] ? 1 : 0,
           'answer_feedback'   => $match['feedback'],
           'question_feedback' => 'Question feedback',
