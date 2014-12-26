@@ -4,7 +4,7 @@
  * Implements hook_install().
  */
 function quizz_matching_install() {
-  variable_set('node_options_matching', array('status'));
+  // variable_set('node_options_matching', array('status'));
 }
 
 /**
@@ -37,7 +37,7 @@ function quizz_matching_schema() {
   );
 
   // User answers go in here.
-  $schema['quiz_matching_user_answers'] = array(
+  $schema['quizz_matching_answer'] = array(
       'fields'      => array(
           'answer_id' => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
           'match_id'  => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
@@ -49,94 +49,4 @@ function quizz_matching_schema() {
   );
 
   return $schema;
-}
-
-/**
- * Implements hook_update_N()
- */
-
-/**
- * Add a table to store properties for the matching questions
- */
-function quizz_matching_update_7400() {
-  $schema = array(
-      'fields'      => array(
-          'nid'            => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
-          'vid'            => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
-          'choice_penalty' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-      ),
-      'primary key' => array('nid', 'vid'),
-  );
-
-  db_create_table('quiz_matching_properties', $schema);
-
-  // Insert default properties for all of the existing matching questions
-  $result = db_query("SELECT nid, vid FROM {node} WHERE type='matching'");
-
-  foreach ($result as $question) {
-    db_insert('quiz_matching_properties')
-      ->fields(array(
-          'nid'            => $question->nid,
-          'vid'            => $question->vid,
-          'choice_penalty' => 0,
-      ))
-      ->execute();
-  }
-}
-
-/**
- * Implements hook_quiz_question_upgrade_schema_node_to_entity().
- */
-function quizz_matching_quiz_question_upgrade_schema_node_to_entity() {
-  if (db_table_exists('quiz_matching_node')) {
-    $spec_1 = array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE);
-    $spec_2 = array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE);
-    db_change_field('quiz_matching_properties', 'nid', 'qid', $spec_1);
-    db_rename_table('quiz_matching_node', 'quiz_matching_question');
-    db_change_field('quiz_matching_question', 'nid', 'qid', $spec_2);
-  }
-}
-
-/**
- * Implements hook_quiz_question_upgrade_pre_drop_temp_columns().
- */
-function quizz_matching_quiz_question_upgrade_pre_drop_temp_columns() {
-  // quiz_matching_properties
-  db_query(
-    "UPDATE {quiz_matching_properties} as qp"
-    . " INNER JOIN {quiz_question_revision} qr ON qp.vid = qr.node_vid"
-    . " SET qp.qid = qr.qid, qp.vid = qr.vid"
-    . " WHERE 1"
-  );
-
-  // quiz_matching_question
-  db_query(
-    "UPDATE {quiz_matching_question} as mq"
-    . " INNER JOIN {quiz_question_revision} qr ON mq.vid = qr.node_vid"
-    . " SET mq.qid = qr.qid, mq.vid = qr.vid"
-    . " WHERE 1"
-  );
-}
-
-/**
- * Make sure update script from main module is run before all.
- */
-function quizz_matching_update_7600() {
-  require_once drupal_get_path('module', 'quizz_question') . '/quizz_question.install';
-  return quizz_question_update_7600();
-}
-
-/**
- * Convert global configuration for questions to question type entity.
- */
-function quizz_matching_update_7601() {
-  foreach (quizz_question_get_types() as $question_type) {
-    if ('matching' === $question_type->handler) {
-      $question_type
-        ->setConfig('quiz_matching_form_size', variable_get('quiz_matching_form_size', TRUE))
-        ->setConfig('quiz_matching_shuffle_options', variable_get('quiz_matching_shuffle_options', TRUE))
-        ->save()
-      ;
-    }
-  }
 }

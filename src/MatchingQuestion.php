@@ -95,7 +95,7 @@ class MatchingQuestion extends QuestionHandler {
       $match_id = db_query('SELECT match_id FROM {quiz_matching_question} WHERE qid = :qid AND vid = :vid', array(
           ':qid' => $this->question->qid,
           ':vid' => $this->question->vid))->fetchCol();
-      db_delete('quiz_matching_user_answers')
+      db_delete('quizz_matching_answer')
         ->condition('match_id', is_array($match_id) ? $match_id : array(0))
         ->execute();
 
@@ -109,7 +109,7 @@ class MatchingQuestion extends QuestionHandler {
       $match_id = db_query(
         'SELECT match_id FROM {quiz_matching_question} WHERE qid = :qid', array(':qid' => $this->question->qid))->fetchCol();
       if (!empty($match_id)) {
-        db_delete('quiz_matching_user_answers')
+        db_delete('quizz_matching_answer')
           ->condition('match_id', $match_id)
           ->execute();
       }

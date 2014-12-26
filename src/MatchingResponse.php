@@ -27,7 +27,7 @@ class MatchingResponse extends ResponseHandler {
   }
 
   public function onLoad(Answer $answer) {
-    $select = db_select('quiz_matching_user_answers', 'input');
+    $select = db_select('quizz_matching_answer', 'input');
     $select->innerJoin('quiz_matching_question', 'question_property', 'input.match_id = question_property.match_id');
     $input = $select
       ->fields('input', array('match_id', 'answer', 'score'))
@@ -52,7 +52,7 @@ class MatchingResponse extends ResponseHandler {
       return;
     }
 
-    $insert = db_insert('quiz_matching_user_answers')->fields(array('match_id', 'result_id', 'answer', 'score'));
+    $insert = db_insert('quizz_matching_answer')->fields(array('match_id', 'result_id', 'answer', 'score'));
     foreach ($this->answer as $key => $value) {
       $insert->values(array(
           'match_id'  => $key,
@@ -76,7 +76,7 @@ class MatchingResponse extends ResponseHandler {
         ':vid' => $this->question->vid
       ))->fetchCol();
 
-    db_delete('quiz_matching_user_answers')
+    db_delete('quizz_matching_answer')
       ->condition('match_id', is_array($match_id) ? $match_id : array(0), 'IN')
       ->condition('result_id', $this->result_id)
       ->execute();
