@@ -5,7 +5,7 @@
  *
  * @param $form
  */
-function theme_matching_question_form($variables) {
+function theme_quizz_matching_question_form($variables) {
   $form = $variables['form'];
   $rows = array();
   $header = array(
@@ -27,7 +27,7 @@ function theme_matching_question_form($variables) {
 /**
  * Theme the answering form
  */
-function theme_matching_subquestion_form($variables) {
+function theme_quizz_matching_subquestion_form($variables) {
   $form = $variables['form'];
   $out = '<table class = "matching-tbl">';
   foreach ($form as $key => $value) {
@@ -46,7 +46,7 @@ function theme_matching_subquestion_form($variables) {
  * @param $subquestions
  *  Array with all the data in the subquestions.
  */
-function theme_matching_match_node_view($variables) {
+function theme_quizz_matching_match_question_view($variables) {
   $subquestions = $variables['subquestions'];
   // We know the correct answer for each subquestion
   if (isset($subquestions[0]['correct'])) {
@@ -67,7 +67,7 @@ function theme_matching_match_node_view($variables) {
  * @param $data
  *  Can be used as table rows
  */
-function theme_matching_response($variables) {
+function theme_quizz_matching_response($variables) {
   $metadata = $variables['metadata'];
   $data = $variables['data'];
   if (isset($data[0]['is_correct'])) {

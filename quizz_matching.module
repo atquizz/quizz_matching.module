@@ -63,22 +63,22 @@ function quizz_matching_config_validate($form, $form_state) {
  */
 function quizz_matching_theme() {
   return array(
-      'matching_question_form'    => array(
+      'quizz_matching_question_form'    => array(
           'render element' => 'form',
           'path'           => drupal_get_path('module', 'quizz_matching') . '/theme',
           'file'           => 'quizz_matching.theme.inc',
       ),
-      'matching_response'         => array(
+      'quizz_matching_response'         => array(
           'variables' => array('metadata' => NULL, 'data' => NULL),
           'path'      => drupal_get_path('module', 'quizz_matching') . '/theme',
           'file'      => 'quizz_matching.theme.inc',
       ),
-      'matching_subquestion_form' => array(
+      'quizz_matching_subquestion_form' => array(
           'render element' => 'form',
           'path'           => drupal_get_path('module', 'quizz_matching') . '/theme',
           'file'           => 'quizz_matching.theme.inc',
       ),
-      'matching_match_node_view'  => array(
+      'quizz_matching_match_question_view'  => array(
           'variables' => array('subquestions' => NULL),
           'path'      => drupal_get_path('module', 'quizz_matching') . '/theme',
           'file'      => 'quizz_matching.theme.inc',

@@ -188,7 +188,7 @@ class MatchingQuestion extends QuestionHandler {
       }
     }
     $content['answers'] = array(
-        '#markup' => theme('matching_match_node_view', array('subquestions' => $subquestions)),
+        '#markup' => theme('quizz_matching_match_question_view', array('subquestions' => $subquestions)),
         '#weight' => 2,
     );
     return $content;
@@ -209,7 +209,7 @@ class MatchingQuestion extends QuestionHandler {
     }
 
     list($matches, $select_option) = $this->getSubquestions();
-    //$form['#theme'] = 'matching_subquestion_form';
+    //$form['#theme'] = 'quizz_matching_subquestion_form';
     foreach ($matches as $match) {
       $form[$match['match_id']] = array(
           '#title'   => $match['question'],
@@ -316,9 +316,10 @@ class MatchingQuestion extends QuestionHandler {
         '#title'       => t('Answer'),
         '#weight'      => -4,
         '#tree'        => TRUE,
-        '#theme'       => 'matching_question_form',
+        '#theme'       => 'quizz_matching_question_form',
         '#description' => t('Write your pairs in the question and answer columns. For the user the question will be fixed and the answers will be shown as alternatives in a dropdown box.'),
     );
+
     for ($i = 1; $i <= $this->question->getQuestionType()->getConfig('quiz_matching_form_size', 5); ++$i) {
       $form['match'][$i] = array(
           '#type'  => 'fieldset',
