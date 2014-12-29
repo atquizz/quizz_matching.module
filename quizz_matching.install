@@ -12,7 +12,7 @@ function quizz_matching_install() {
  */
 function quizz_matching_schema() {
   // Properties for a question nodes go in here:
-  $schema['quiz_matching_properties'] = array(
+  $schema['quiz_matching_question_settings'] = array(
       'fields'      => array(
           'qid'            => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
           'vid'            => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),

@@ -24,7 +24,7 @@ class MatchingQuestion extends QuestionHandler {
    */
   public function onSave($is_new = FALSE) {
     // Update or insert the question properties
-    db_merge('quiz_matching_properties')
+    db_merge('quiz_matching_question_settings')
       ->key(array('qid' => $this->question->qid, 'vid' => $this->question->vid))
       ->fields(array('choice_penalty' => $this->question->choice_penalty))
       ->execute();
@@ -87,7 +87,7 @@ class MatchingQuestion extends QuestionHandler {
   public function delete($only_this_version = FALSE) {
     parent::delete($only_this_version);
 
-    $delete_properties = db_delete('quiz_matching_properties')->condition('qid', $this->question->qid);
+    $delete_properties = db_delete('quiz_matching_question_settings')->condition('qid', $this->question->qid);
 
     if ($only_this_version) {
       $delete_properties->condition('vid', $this->question->vid);
@@ -134,7 +134,7 @@ class MatchingQuestion extends QuestionHandler {
     $props = parent::load();
 
     $res_a = db_query(
-      'SELECT choice_penalty FROM {quiz_matching_properties} WHERE qid = :qid AND vid = :vid', array(
+      'SELECT choice_penalty FROM {quiz_matching_question_settings} WHERE qid = :qid AND vid = :vid', array(
         ':qid' => $this->question->qid,
         ':vid' => $this->question->vid
       ))->fetchAssoc();
