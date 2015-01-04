@@ -11,6 +11,7 @@ use Drupal\quizz_question\QuestionHandler;
 class MatchingQuestion extends QuestionHandler {
 
   protected $body_field_title = 'Instruction';
+  protected $base_table = 'quiz_matching_question';
 
   public function __construct(Question $question) {
     parent::__construct($question);
@@ -80,52 +81,27 @@ class MatchingQuestion extends QuestionHandler {
   }
 
   /**
-   * Implementation of delete
-   *
-   * @see QuizQuestion#delete($only_this_version)
+   * {@inheritdoc}
    */
-  public function delete($only_this_version = FALSE) {
-    parent::delete($only_this_version);
+  public function delete($single_revision = FALSE) {
+    $key = $single_revision ? 'vid' : 'qid';
+    $id = $this->question->{$key};
 
-    $delete_properties = db_delete('quiz_matching_question_settings')->condition('qid', $this->question->qid);
+    db_delete('quiz_matching_question_settings')
+      ->condition($key, $id)
+      ->execute();
 
-    if ($only_this_version) {
-      $delete_properties->condition('vid', $this->question->vid);
+    $sql = "DELETE ap";
+    $sql .= " FROM {quizz_matching_answer} ap";
+    $sql .= " INNER JOIN {quiz_matching_question} qp ON ap.match_id = qp.match_id";
+    $sql .= " WHERE qp.{$key} = :id";
+    db_query($sql, array(':id' => $id));
 
-      $match_id = db_query('SELECT match_id FROM {quiz_matching_question} WHERE qid = :qid AND vid = :vid', array(
-          ':qid' => $this->question->qid,
-          ':vid' => $this->question->vid))->fetchCol();
-      db_delete('quizz_matching_answer')
-        ->condition('match_id', is_array($match_id) ? $match_id : array(0))
-        ->execute();
-
-      db_delete('quiz_matching_question')
-        ->condition('qid', $this->question->qid)
-        ->condition('vid', $this->question->vid)
-        ->execute();
-    }
-    // Delete all versions of this question.
-    else {
-      $match_id = db_query(
-        'SELECT match_id FROM {quiz_matching_question} WHERE qid = :qid', array(':qid' => $this->question->qid))->fetchCol();
-      if (!empty($match_id)) {
-        db_delete('quizz_matching_answer')
-          ->condition('match_id', $match_id)
-          ->execute();
-      }
-
-      db_delete('quiz_matching_question')
-        ->condition('qid', $this->question->qid)
-        ->execute();
-    }
-
-    $delete_properties->execute();
+    parent::delete($single_revision);
   }
 
   /**
-   * Implementation of load
-   *
-   * @see QuizQuestion#load()
+   * {@inheritdoc}
    */
   public function load() {
     if (isset($this->properties)) {

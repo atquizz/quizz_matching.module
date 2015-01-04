@@ -11,9 +11,6 @@ use Drupal\quizz_question\ResponseHandler;
  */
 class MatchingResponse extends ResponseHandler {
 
-  /**
-   * Constructor
-   */
   public function __construct($result_id, Question $question, $input = NULL) {
     parent::__construct($result_id, $question, $input);
 
@@ -31,8 +28,7 @@ class MatchingResponse extends ResponseHandler {
     $select->innerJoin('quiz_matching_question', 'question_property', 'input.match_id = question_property.match_id');
     $input = $select
       ->fields('input', array('match_id', 'answer', 'score'))
-      ->condition('question_property.vid', $answer->question_vid)
-      ->condition('input.result_id', $answer->result_id)
+      ->condition('answer_id', $answer->id)
       ->execute()
       ->fetchAllKeyed()
     ;
@@ -43,20 +39,19 @@ class MatchingResponse extends ResponseHandler {
   }
 
   /**
-   * Implementation of save
-   *
-   * @see QuizQuestionResponse#save()
+   * {@inheritdoc}
    */
   public function save() {
     if (!isset($this->answer) || !is_array($this->answer)) {
       return;
     }
 
-    $insert = db_insert('quizz_matching_answer')->fields(array('match_id', 'result_id', 'answer', 'score'));
+    $insert = db_insert('quizz_matching_answer')->fields(array('answer_id', 'match_id', 'answer', 'score'));
+    $answer_id = $this->loadAnswerEntity()->id;
     foreach ($this->answer as $key => $value) {
       $insert->values(array(
+          'answer_id' => $answer_id,
           'match_id'  => $key,
-          'result_id' => $this->result_id,
           'answer'    => (int) $value,
           'score'     => ($key == $value) ? 1 : 0,
       ));
@@ -65,27 +60,21 @@ class MatchingResponse extends ResponseHandler {
   }
 
   /**
-   * Implementation of delete
-   *
-   * @see QuizQuestionResponse#delete()
+   * {@inheritdoc}
    */
   public function delete() {
-    $match_id = db_query(
-      'SELECT match_id FROM {quiz_matching_question} WHERE qid = :qid AND vid = :vid', array(
-        ':qid' => $this->question->qid,
-        ':vid' => $this->question->vid
-      ))->fetchCol();
-
-    db_delete('quizz_matching_answer')
-      ->condition('match_id', is_array($match_id) ? $match_id : array(0), 'IN')
-      ->condition('result_id', $this->result_id)
-      ->execute();
+    db_query(
+      "DELETE ap FROM {quizz_matching_answer} ap"
+      . " INNER JOIN {quiz_answer_entity} answer ON ap.answer_id = answer.id"
+      . " WHERE answer.result_id = :result_id AND answer.question_vid = :vid", array(
+        ':result_id' => $this->result_id,
+        ':vid'       => $this->question->vid,
+      )
+    );
   }
 
   /**
-   * Implementation of score
-   *
-   * @see QuizQuestionResponse#score()
+   * {@inheritdoc}
    */
   public function score() {
     $wrong_answer = 0;
@@ -114,7 +103,7 @@ class MatchingResponse extends ResponseHandler {
   }
 
   /**
-   * Implementation of getFeedbackValues.
+   * {@inheritdoc}
    */
   public function getFeedbackValues() {
     $data = array();

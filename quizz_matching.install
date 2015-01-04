@@ -39,13 +39,12 @@ function quizz_matching_schema() {
   // User answers go in here.
   $schema['quizz_matching_answer'] = array(
       'fields'      => array(
-          'answer_id' => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+          'answer_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
           'match_id'  => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
-          'result_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
           'score'     => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
           'answer'    => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
       ),
-      'primary key' => array('answer_id'),
+      'primary key' => array('answer_id', 'match_id'),
   );
 
   return $schema;
