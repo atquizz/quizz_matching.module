@@ -3,6 +3,7 @@
 namespace Drupal\quizz_matching;
 
 use Drupal\quizz_question\Entity\Question;
+use Drupal\quizz_question\Entity\QuestionType;
 use Drupal\quizz_question\QuestionHandler;
 
 /**
@@ -380,6 +381,29 @@ class MatchingQuestion extends QuestionHandler {
       );
     }
     return $correct_answers;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function questionTypeConfigForm(QuestionType $question_type) {
+    $form = array('#validate' => array('quizz_matching_config_validate'));
+
+    $form['quiz_matching_form_size'] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Match Question Size'),
+        '#description'   => t('Number of questions allowed to wrap under a matching type question.'),
+        '#default_value' => $question_type->getConfig('quiz_matching_form_size', 5),
+    );
+
+    $form['quiz_matching_shuffle_options'] = array(
+        '#type'          => 'checkbox',
+        '#title'         => t('Shuffle Matching Questions'),
+        '#default_value' => $question_type->getConfig('quiz_matching_shuffle_options', TRUE),
+        '#description'   => t('If checked matching questions will be shuffled'),
+    );
+
+    return $form;
   }
 
 }
