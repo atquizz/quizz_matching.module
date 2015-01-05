@@ -66,9 +66,8 @@ class MatchingResponse extends ResponseHandler {
     db_query(
       "DELETE ap FROM {quizz_matching_answer} ap"
       . " INNER JOIN {quiz_answer_entity} answer ON ap.answer_id = answer.id"
-      . " WHERE answer.result_id = :result_id AND answer.question_vid = :vid", array(
-        ':result_id' => $this->result_id,
-        ':vid'       => $this->question->vid,
+      . " WHERE answer.question_vid = :vid", array(
+        ':vid' => $this->question->vid,
       )
     );
   }
